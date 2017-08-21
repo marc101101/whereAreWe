@@ -1,0 +1,53 @@
+<div class="row" id="wrapper">
+  <div id="mapContainer" style="width:100%;height:700px"></div>
+  <div id="over_map" style="width:400px">
+
+    <div class="row">
+      <div class="col s12 m12">
+        <div class="card" style="background-color:#026384; width: 100%; height:75px;">
+          <div class="row">
+            <div class="col s1 m1" style="padding:0px">
+              <div class="valign-wrapper" style="background-color:white; width: 75px; height: 75px; float:left;margin-right: 15px;">
+                <i class="material-icons" style="color:#026384; width: 100%;height: 100%;text-align: center; margin-top: 47px; font-size: 30px">search</i>
+              </div>
+            </div>
+            <div class="card-content white-text col s9 m9" style="padding:0px; float:right; margin-right:10px; font-size: 21px">
+              <div class="input-field">
+                  <input id="search" (keyup)="keyDownFunction($event)" 
+                  type="text" class="validate white-text input-main"
+                  placeholder="Tippen Sie Ihren Städtenamen ein"
+                  autocomplete="off"
+                  [attr.value]="inputValue">
+              </div>
+              <div *ngIf="autoCompleteAvailable" class="card black-text" style="position: absolute; z-index: 1; width: 77%; margin-top: -15px">
+                  <a #result *ngFor="let searchResult of autoCompleteResults; let index = index" (click)="autoCompleteClicked(result)" [attr.data-city]="searchResult[0]">
+                  <div class="card-action" [class.active]="index == activeElement">
+                     {{searchResult[0]}}
+                  </div>
+                  </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="cityClicked" class="col s12 m12 flipInX">
+        <div class="card card-margin-top" style="background-color:#026384;  height:auto;">
+          <div class="row">
+            <div class="circle"></div>
+            <div class="circle_small"></div>
+            <div class="col s3 m3" style="padding: 15px;vertical-align:center">
+              <h4 class="white-text" style="text-align: center"><b>{{currentCity.sum_over_all}}</b></h4>
+            </div>
+            <div class="col s9 m9" style="margin-left: -13px; padding: 15px; font-size: 14px;">
+              <h6 class="white-text">{{currentCity.city}}</h6>
+              <span class="white-text">Menschen sind von 2010 - 2015 
+                    von hier nach Regensburg gezogen.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

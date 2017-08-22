@@ -1,8 +1,10 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   NgZone,
-  Renderer
+  Renderer,
+  ViewChild, ElementRef
 } from '@angular/core';
 
 import {
@@ -14,19 +16,20 @@ import {
   Headers,
   RequestOptions
 } from '@angular/http';
-import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/map';
 
 declare var require: any;
 declare var $: any
 
 var GoogleMapsLoader = require('google-maps');
+var chartJs = require('chart.js');
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   map: any;
   google: any;
   globalData: any;
@@ -43,6 +46,10 @@ export class AppComponent implements OnInit {
   circleClicked: boolean = false;
   circleRegistry = [];
   currentCircleInMap: any;
+  myChart: any;
+  showGraph: boolean = false;
+  @ViewChild("graphCanvas") graphCanvas: ElementRef; 
+ 
 
   constructor(private zone: NgZone, private dataService: DataService, private renderer: Renderer) {}
 
@@ -64,16 +71,24 @@ export class AppComponent implements OnInit {
     )
   }
 
+  ngAfterViewInit(){
+    document.getElementById("mapContainer").style.overflow = "visible";    
+  }
+
   getFontSize(sum_over_all): string {
     let lenOfNum = sum_over_all.toString().length;
     switch (lenOfNum) {
       case 4:
-        return "30px";
-      case 5:
         return "25px";
+      case 5:
+        return "20px";
       default:
         return "35px";
     }
+  }
+
+  animateShare(event): void{
+    console.log(event);
   }
 
   over(event): void {
@@ -119,15 +134,15 @@ export class AppComponent implements OnInit {
   }
 
   autoCompleteClicked(event): void {
+    
     try {
       var cityClicked = event.getAttribute('data-city');
     } catch (error) {
       var cityClicked = event.value;
     }
-    this.inputValue = cityClicked;
-
-    this.globalData.migration_data.forEach(element => {
-      if (element.city.includes(cityClicked)) {
+      
+    this.globalData.migration_data.forEach(element => {     
+      if (element.city.includes(cityClicked)) {        
         this.currentCity = element;
         this.map.setCenter({
           lat: this.currentCity.geo_data.lat,
@@ -138,8 +153,9 @@ export class AppComponent implements OnInit {
         this.cityClicked = true;
       }
     });
+    (<HTMLInputElement>document.getElementById("search")).value = this.currentCity.city;
     this.autoCompleteAvailable = false;
-
+    this.setGraphView(this.currentCity.data_by_year);
   }
 
   highlightClickedCircle(): void {
@@ -159,6 +175,33 @@ export class AppComponent implements OnInit {
         });
       }
     });
+  }
+
+  setGraphView(data_by_year): void{  
+    if(this.myChart){
+      this.myChart.destroy();
+    } 
+    let context: CanvasRenderingContext2D = this.graphCanvas.nativeElement.getContext("2d");
+    this.myChart = new chartJs(context, {
+      type: 'line',
+      data: {
+          labels: ["2010", "2011", "2012", "2013", "2014", "2015"],
+          datasets: [{
+              data: {
+                "font-size": 0
+              },
+              label: false,
+              backgroundColor: [
+                  'rgba(34, 117, 146, 1)',
+                  'rgba(34, 117, 146, 1)',
+                  'rgba(34, 117, 146, 1)',
+                  'rgba(34, 117, 146, 1)',
+                  'rgba(34, 117, 146, 1)',
+                  'rgba(34, 117, 146, 1)'
+              ],
+          }]
+      }
+  });  
   }
 
   getRadius(data): any {
@@ -223,6 +266,7 @@ export class AppComponent implements OnInit {
                 lng: localThis.currentCity.geo_data.lng
               });
               localThis.map.setZoom(10);
+              localThis.setGraphView(localThis.currentCity.data_by_year);
             });
 
             cityCircle.addListener('mouseover', function (e) {

@@ -16,7 +16,6 @@ import {
 } from '@angular/http';
 import 'rxjs/add/operator/map'
 
-
 declare var require: any;
 declare var $: any
 
@@ -39,9 +38,11 @@ export class AppComponent implements OnInit {
   currentCircle: any;
   autoCompleteResults: any;
   autoCompleteAvailable: boolean = true;
-  inputValue:string = "";
+  inputValue: string = "";
   activeElement: number = -1;
   circleClicked: boolean = false;
+  circleRegistry = [];
+  currentCircleInMap: any;
 
   constructor(private zone: NgZone, private dataService: DataService, private renderer: Renderer) {}
 
@@ -63,65 +64,101 @@ export class AppComponent implements OnInit {
     )
   }
 
+  getFontSize(sum_over_all): string {
+    let lenOfNum = sum_over_all.toString().length;
+    switch (lenOfNum) {
+      case 4:
+        return "30px";
+      case 5:
+        return "25px";
+      default:
+        return "35px";
+    }
+  }
+
+  over(event): void {
+    this.activeElement = event.target.getAttribute('data-index');
+  }
+
   keyDownFunction(event): void {
-    if(event.key == "ArrowDown"){
-      if(this.activeElement < 3){
+    if (event.key == "ArrowDown") {
+      if (this.activeElement < this.autoCompleteResults.length - 1) {
         this.activeElement = this.activeElement + 1;
       }
     }
-    if(event.key == "ArrowUp"){
-      if(this.activeElement > 0){
+    if (event.key == "ArrowUp") {
+      if (this.activeElement > 0) {
         this.activeElement = this.activeElement - 1;
       }
     }
-    
     if (event.key == "Enter") {
-      console.log(this.autoCompleteResults[this.activeElement][0]);
-      
-      this.autoCompleteClicked({"value": this.autoCompleteResults[this.activeElement][0]})
+      this.autoCompleteClicked({
+        "value": this.autoCompleteResults[this.activeElement][0]
+      })
     } else {
       this.autoCompleteResults = [];
       if (event.target.value.length > 0) {
         this.globalData.migration_data.forEach(element => {
-          if (element.city.includes(event.target.value)) {
+          var element_low = element.city.toLowerCase();
+          var target_low = event.target.value.toLowerCase();
+          if (element_low.includes(target_low)) {
             this.autoCompleteResults.push([element.city, element.sum_over_all]);
           }
         });
-        this.autoCompleteResults.sort(function(a, b){         
-            var keyA = a[1],
-                keyB = b[1];
-            // Compare the 2 dates
-            if(keyA < keyB) return 1;
-            if(keyA > keyB) return -1;
-            return 0;
+        this.autoCompleteResults.sort(function (a, b) {
+          var keyA = a[1],
+            keyB = b[1];
+          if (keyA < keyB) return 1;
+          if (keyA > keyB) return -1;
+          return 0;
         });
-        this.autoCompleteResults = this.autoCompleteResults.slice(0,4);
-        this.autoCompleteAvailable = true;        
+        this.autoCompleteResults = this.autoCompleteResults.slice(0, 4);
+        this.autoCompleteAvailable = true;
       }
     }
   }
 
-  autoCompleteClicked(event): void{
+  autoCompleteClicked(event): void {
     try {
-      var cityClicked = event.getAttribute('data-city');      
+      var cityClicked = event.getAttribute('data-city');
     } catch (error) {
-      var cityClicked = event.value;      
+      var cityClicked = event.value;
     }
     this.inputValue = cityClicked;
 
     this.globalData.migration_data.forEach(element => {
-      if(element.city.includes(cityClicked)){
+      if (element.city.includes(cityClicked)) {
         this.currentCity = element;
         this.map.setCenter({
           lat: this.currentCity.geo_data.lat,
           lng: this.currentCity.geo_data.lng
         });
-        this.map.setZoom(8);
+        this.map.setZoom(10);
+        this.highlightClickedCircle()
         this.cityClicked = true;
       }
     });
-    this.autoCompleteAvailable = false;         
-    
+    this.autoCompleteAvailable = false;
+
+  }
+
+  highlightClickedCircle(): void {
+    this.circleRegistry.forEach(element => {
+      if (element.data_obj.city == this.currentCity.city) {
+        try {
+          this.currentCircleInMap.setOptions({
+            fillColor: '#026384',
+            strokeColor: '#026384'
+          });
+        } catch (error) {         
+        }
+        this.currentCircleInMap = element;
+        element.setOptions({
+          fillColor: '#d7490b',
+          strokeColor: '#026384'
+        });
+      }
+    });
   }
 
   getRadius(data): any {
@@ -146,7 +183,6 @@ export class AppComponent implements OnInit {
       for (var i = 0; i < localThis.globalData.migration_data.length; i++) {
         var data = localThis.globalData;
 
-        // Add the circle for this city to the map.
         try {
           GoogleMapsLoader.load(function (google) {
             var cityCircle = new google.maps.Circle({
@@ -163,12 +199,25 @@ export class AppComponent implements OnInit {
               radius: localThis.getRadius(data.migration_data[i]),
               data_obj: data.migration_data[i]
             });
+            localThis.circleRegistry.push(cityCircle);
 
             cityCircle.addListener('click', function (e) {
               localThis.currentCity = cityCircle.data_obj;
               localThis.cityClicked = true;
-              localThis.zone.run(() => { // <== added
+
+              localThis.zone.run(() => {});
+              cityCircle.setOptions({
+                fillColor: '#d7490b',
+                strokeColor: '#026384'
               });
+              if (localThis.currentCircleInMap) {
+                localThis.currentCircleInMap.setOptions({
+                  fillColor: '#026384',
+                  strokeColor: '#026384'
+                });
+              }
+              localThis.currentCircleInMap = cityCircle;
+
               localThis.map.setCenter({
                 lat: localThis.currentCity.geo_data.lat,
                 lng: localThis.currentCity.geo_data.lng
@@ -184,18 +233,26 @@ export class AppComponent implements OnInit {
             });
 
             cityCircle.addListener('mouseout', function (e) {
-              cityCircle.setOptions({
-                fillColor: '#026384',
-                strokeColor: '#026384'
-              });
+              try {
+                if (cityCircle.data_obj.city != localThis.currentCircleInMap.data_obj.city) {
+                  cityCircle.setOptions({
+                    fillColor: '#026384',
+                    strokeColor: '#026384'
+                  }); 
+                }
+              } catch (error) {
+
+                cityCircle.setOptions({
+                  fillColor: '#026384',
+                  strokeColor: '#026384'
+                });
+              }
             });
-          }, localThis);
+          });
         } catch (error) {
           console.log(error)
         }
       }
     }, localThis);
   }
-
-  
 }

@@ -21,7 +21,7 @@
               </div>
               <div *ngIf="autoCompleteAvailable" class="card black-text" style="position: absolute; z-index: 1; width: 77%; margin-top: -15px">
                   <a #result *ngFor="let searchResult of autoCompleteResults; let index = index" (click)="autoCompleteClicked(result)" [attr.data-city]="searchResult[0]">
-                  <div class="card-action" [class.active]="index == activeElement">
+                  <div class="card-action" on-mouseover='over($event)' [attr.data-index]="index" [class.active]="index == activeElement">
                      {{searchResult[0]}}
                   </div>
                   </a>
@@ -37,7 +37,7 @@
             <div class="circle"></div>
             <div class="circle_small"></div>
             <div class="col s3 m3" style="padding: 15px;vertical-align:center">
-              <h4 class="white-text" style="text-align: center"><b>{{currentCity.sum_over_all}}</b></h4>
+              <h4 class="white-text" [style.font-size]="getFontSize(currentCity.sum_over_all)"><b>{{currentCity.sum_over_all}}</b></h4>
             </div>
             <div class="col s9 m9" style="margin-left: -13px; padding: 15px; font-size: 14px;">
               <h6 class="white-text">{{currentCity.city}}</h6>

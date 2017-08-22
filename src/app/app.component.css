@@ -75,11 +75,6 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
   height: 50px;
 }
 
-.card-action:hover{
-  background-color: #227592;
-  color:white;
-}
-
 .active{
   background-color: #227592;
   color:white;

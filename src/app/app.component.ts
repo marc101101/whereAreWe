@@ -180,17 +180,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   setGraphView(data_by_year): void{  
     if(this.myChart){
       this.myChart.destroy();
-    } 
+    }
+    
     let context: CanvasRenderingContext2D = this.graphCanvas.nativeElement.getContext("2d");
+    console.log(context);
+    
     this.myChart = new chartJs(context, {
       type: 'line',
       data: {
           labels: ["2010", "2011", "2012", "2013", "2014", "2015"],
           datasets: [{
-              data: {
-                "font-size": 0
-              },
-              label: false,
+              data: data_by_year,
               backgroundColor: [
                   'rgba(34, 117, 146, 1)',
                   'rgba(34, 117, 146, 1)',

@@ -5,12 +5,88 @@
   margin: 0px;
 }
 
-
 #over_map {
-  position: fixed;
+  width: 350px;
+  position: absolute;
   top: 10px;
-  left: 2px;
+  left: 13px;
   z-index: 99;
+}
+
+@media (max-width: 500px) {
+  #over_map {
+    width: 90%;
+  }
+}
+
+.overlay-wrapper {
+  background-color: #026384;
+  width: 100%;
+  height: 75px;
+}
+
+.search-wrapper {
+  width: 75px;
+  height: 75px;
+  float: left;
+  margin-right: 15px;
+}
+
+.search-icon {
+  color: white;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  margin-top: 47px;
+  font-size: 35px;
+}
+
+.search-content {
+  padding: 0px;
+  float: right;
+  margin-right: 10px;
+  font-size: 21px;
+}
+
+.autocomplete-content {
+  position: absolute;
+  z-index: 5;
+  width: 77%;
+  margin-top: -15px;
+  z-index: 7;
+}
+
+.location-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  float: right;
+  margin-right: -30px;
+  margin-top: -25px;
+  z-index: 4;
+}
+
+.location-icon-style-blue {
+  background-color: #026384;
+  color: white;
+}
+
+.location-icon-style-white {
+  background-color: white;
+  color: #026384
+}
+
+.example-content {
+  background-color: white;
+  height: 100%;
+  margin-top: -10px;
+  width: 80%;
+  float: right
+}
+
+.example-row-content {
+  margin-bottom: 0px;
+  padding: 10px
 }
 
 .input-main {
@@ -20,32 +96,64 @@
   font-size: 17px !important;
 }
 
-input:not([type]), input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea {
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid #9e9e9e;
-  border-radius: 0;
-  outline: none;
-  height: 3rem;
-  width: 100%;
-  font-size: 1rem;
-  margin: 0 0 20px 0;
-  padding: 0;
-  box-shadow: none;
-  box-sizing: content-box;
-  transition: all 0.3s;
+.city-content {
+  background-color: #026384;
+  height: auto;
+  margin-top: 30px
 }
 
-.card-margin-top{
-  margin-top: -5px;
+.city-icon {
+  width: 40px;
+  height: 40px;
+  position: inherit;
+  float: right;
+  margin-right: -20px;
+  margin-top: -20px;
 }
 
-.circle { 
+.city-font {
+  padding: 15px;
+  vertical-align: center;
+  margin-top: 15px
+}
+
+.city-current {
+  margin-left: -13px;
+  padding: 15px;
+  font-size: 14px;
+  margin-top: -20px;
+}
+
+.city-info-text {
+  font-size: 13px;
+}
+
+.graph-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  float: left;
+  margin-left: -20px;
+  margin-top: -40px;
+  z-index: 3
+}
+
+.graph-content {
+  background-color: white;
+  height: 100%;
+  margin-top: -11px
+}
+
+.margin-top-15 {
+  margin-top: 15px;
+}
+
+.circle {
   width: 60px;
   height: 100%;
-  background: white; 
-  -moz-border-radius: 70px; 
-  -webkit-border-radius: 70px; 
+  background: white;
+  -moz-border-radius: 70px;
+  -webkit-border-radius: 70px;
   border-radius: 70px;
   border-bottom-left-radius: 0px;
   border-top-left-radius: 0px;
@@ -53,12 +161,12 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
   opacity: 0.2;
 }
 
-.circle_small{ 
+.circle_small {
   width: 20px;
   height: 40px;
-  background: white; 
-  -moz-border-radius: 20px; 
-  -webkit-border-radius: 70px; 
+  background: white;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 70px;
   border-radius: 70px;
   border-bottom-left-radius: 0px;
   border-top-left-radius: 0px;
@@ -67,12 +175,12 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
   opacity: 0.2;
 }
 
-.circle_one { 
+.circle_one {
   width: 37px;
   height: 75px;
-  background: white; 
-  -moz-border-radius: 70px; 
-  -webkit-border-radius: 70px; 
+  background: white;
+  -moz-border-radius: 70px;
+  -webkit-border-radius: 70px;
   border-radius: 70px;
   border-bottom-left-radius: 0px;
   border-top-left-radius: 0px;
@@ -80,12 +188,12 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
   opacity: 0.2;
 }
 
-.circle_one_small{ 
+.circle_one_small {
   width: 20px;
   height: 40px;
-  background: white; 
-  -moz-border-radius: 20px; 
-  -webkit-border-radius: 70px; 
+  background: white;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 70px;
   border-radius: 70px;
   border-bottom-left-radius: 0px;
   border-top-left-radius: 0px;
@@ -94,23 +202,23 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
   opacity: 0.2;
 }
 
-.card-action{
+.card-action {
   font-size: 15px !important;
   height: 50px;
 }
 
-.active{
+.active {
   background-color: #227592;
-  color:white;
+  color: white;
 }
 
-a{
+a {
   color: #227592
 }
 
 .waves-effect {
   position: relative;
-  display: block; 
+  display: block;
   overflow: hidden;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -126,14 +234,109 @@ a{
   line-height: 42px;
 }
 
-input.valid:not([type]), input.valid:not([type]):focus, input[type=text].valid:not(.browser-default), input[type=text].valid:not(.browser-default):focus, input[type=password].valid:not(.browser-default), input[type=password].valid:not(.browser-default):focus, input[type=email].valid:not(.browser-default), input[type=email].valid:not(.browser-default):focus, input[type=url].valid:not(.browser-default), input[type=url].valid:not(.browser-default):focus, input[type=time].valid:not(.browser-default), input[type=time].valid:not(.browser-default):focus, input[type=date].valid:not(.browser-default), input[type=date].valid:not(.browser-default):focus, input[type=datetime].valid:not(.browser-default), input[type=datetime].valid:not(.browser-default):focus, input[type=datetime-local].valid:not(.browser-default), input[type=datetime-local].valid:not(.browser-default):focus, input[type=tel].valid:not(.browser-default), input[type=tel].valid:not(.browser-default):focus, input[type=number].valid:not(.browser-default), input[type=number].valid:not(.browser-default):focus, input[type=search].valid:not(.browser-default), input[type=search].valid:not(.browser-default):focus, textarea.materialize-textarea.valid, textarea.materialize-textarea.valid:focus, .select-wrapper.valid>input.select-dropdown {
-  border-bottom: 0px solid  !important;
+input.valid:not([type]),
+input.valid:not([type]):focus,
+input[type=text].valid:not(.browser-default),
+input[type=text].valid:not(.browser-default):focus,
+input[type=password].valid:not(.browser-default),
+input[type=password].valid:not(.browser-default):focus,
+input[type=email].valid:not(.browser-default),
+input[type=email].valid:not(.browser-default):focus,
+input[type=url].valid:not(.browser-default),
+input[type=url].valid:not(.browser-default):focus,
+input[type=time].valid:not(.browser-default),
+input[type=time].valid:not(.browser-default):focus,
+input[type=date].valid:not(.browser-default),
+input[type=date].valid:not(.browser-default):focus,
+input[type=datetime].valid:not(.browser-default),
+input[type=datetime].valid:not(.browser-default):focus,
+input[type=datetime-local].valid:not(.browser-default),
+input[type=datetime-local].valid:not(.browser-default):focus,
+input[type=tel].valid:not(.browser-default),
+input[type=tel].valid:not(.browser-default):focus,
+input[type=number].valid:not(.browser-default),
+input[type=number].valid:not(.browser-default):focus,
+input[type=search].valid:not(.browser-default),
+input[type=search].valid:not(.browser-default):focus,
+textarea.materialize-textarea.valid,
+textarea.materialize-textarea.valid:focus,
+.select-wrapper.valid>input.select-dropdown {
+  border-bottom: 0px solid !important;
   -webkit-box-shadow: 0 0px 0 0 !important;
-  box-shadow: 0 0px 0 0  !important;
+  box-shadow: 0 0px 0 0 !important;
 }
 
-input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
-  border-bottom: 0px solid  !important;
+input:not([type]):focus:not([readonly]),
+input[type=text]:not(.browser-default):focus:not([readonly]),
+input[type=password]:not(.browser-default):focus:not([readonly]),
+input[type=email]:not(.browser-default):focus:not([readonly]),
+input[type=url]:not(.browser-default):focus:not([readonly]),
+input[type=time]:not(.browser-default):focus:not([readonly]),
+input[type=date]:not(.browser-default):focus:not([readonly]),
+input[type=datetime]:not(.browser-default):focus:not([readonly]),
+input[type=datetime-local]:not(.browser-default):focus:not([readonly]),
+input[type=tel]:not(.browser-default):focus:not([readonly]),
+input[type=number]:not(.browser-default):focus:not([readonly]),
+input[type=search]:not(.browser-default):focus:not([readonly]),
+textarea.materialize-textarea:focus:not([readonly]) {
+  border-bottom: 0px solid !important;
   -webkit-box-shadow: 0 0px 0 0 !important;
-  box-shadow: 0 0px 0 0  !important;
+  box-shadow: 0 0px 0 0 !important;
+}
+
+input:not([type]),
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=url],
+input[type=time],
+input[type=date],
+input[type=datetime],
+input[type=datetime-local],
+input[type=tel],
+input[type=number],
+input[type=search],
+textarea.materialize-textarea {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #9e9e9e;
+  border-radius: 0;
+  outline: none;
+  height: 3rem;
+  width: 100%;
+  font-size: 1rem;
+  margin: 0 0 20px 0;
+  padding: 0;
+  box-shadow: none;
+  box-sizing: content-box;
+  transition: all 0.3s;
+}
+
+
+.fixed-action-btn {
+  position: relative;
+  right: 23px;
+  bottom: 23px;
+  padding-top: 15px;
+  margin-bottom: 0;
+  z-index: 5;
+}
+
+.fixed-action-btn[_ngcontent-c0] {
+  position: relative;
+  right: 23px;
+  bottom: 23px;
+  padding-top: 0px; 
+  margin-bottom: 0;
+  z-index: 5;
+}
+
+.fixed-action-btn.horizontal ul {
+  right: 0px;
+  top: -30px;
+}
+
+.fixed-action-btn.horizontal ul li {
+  display: inline-block;
+  margin: 12px 15px 0 0;
 }

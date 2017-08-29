@@ -18,6 +18,7 @@ import {
   RequestOptions
 } from '@angular/http';
 import 'rxjs/add/operator/map';
+import {DomSanitizer} from '@angular/platform-browser';
 
 declare var require: any;
 declare var $: any
@@ -38,8 +39,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   google: any;
   globalData: any;
   styleData: any;
-  dataUrl: string = "/assets/data/local_all_result_final.json";
-  mapStyleUrl: string = "/assets/data/map-style.json";
+  dataUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/local_all_result_final.json";
+  mapStyleUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/map-style.json";
+  //dataUrl: string = "/assets/data/local_all_result_final.json";
+  //mapStyleUrl: string = "/assets/data/map-style.json";
   cityClicked: boolean = false;
   currentCity: {
     "city": "",
@@ -69,7 +72,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private zone: NgZone,
     private dataService: DataService,
-    private renderer: Renderer) {}
+    private renderer: Renderer,
+    private sanitizer:DomSanitizer) {}
 
   ngOnInit() {
     var data = "";
@@ -99,27 +103,26 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.mobile = false;
   }
 
-  getShareAbleUrl(social_service): string {
+  getShareAbleUrl(social_service): any {
     switch (social_service) {
       case "facebook":
-        return "https://www.facebook.com/dialog/share?app_id=" +
-          218490268482189 +
-          "&display=popup" +
-          "&href=http://stories.mittelbayerische.de/woherko" +
-          "&description=" + "" +
-          "&redirect_uri=http://stories.mittelbayerische.de/woherko ";
+        return "https://www.facebook.com/sharer/sharer.php?u=" + window.location.href;
       case "whatsapp":
-        return "whatsapp://send?text=http://stories.mittelbayerische.de/woherko " +
+        return this.sanitizer.bypassSecurityTrustUrl(
+          "whatsapp://send?text=" +
+          window.location.href + 
+          " Von 2010 - 2015 sind  " +
           this.currentCity.sum_over_all +
-          " Menschen sind von 2010 - 2015 von " +
+          " Menchen von " + 
           this.currentCity.city +
-          " nach Regensburg gezogen.";
+          " nach Regensburg gezogen.");          
       case "twitter":
         return "https://twitter.com/intent/tweet?text=" +
           this.currentCity.sum_over_all +
           " Menschen sind von 2010 - 2015 von " +
           this.currentCity.city +
-          " nach Regensburg gezogen. http://stories.mittelbayerische.de/woherko"
+          " nach Regensburg gezogen." + 
+          window.location.href
       default:
         break;
     }

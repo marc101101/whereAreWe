@@ -15,7 +15,7 @@
             <div class="card-content white-text col s9 m9 search-content">
               <div class="input-field">
                 <input id="search" (keyup)="keyDownFunction($event)" type="text" class="validate white-text input-main" placeholder="Suchen Sie nach Ihrer Stadt"
-                  autocomplete="off" [attr.value]="inputValue">
+                  autocomplete="off" [attr.value]="inputValue" onClick="this.setSelectionRange(0, this.value.length)">
               </div>
               <div *ngIf="autoCompleteAvailable" class="card black-text autocomplete-content">
                 <a #result *ngFor="let searchResult of autoCompleteResults; let index = index" (click)="autoCompleteClicked(result)" [attr.data-city]="searchResult[0]">
@@ -37,8 +37,8 @@
               <div class="card card-margin-top example-content">
                 <div class="row example-row-content">
                   <div class="col s12 m12">
-                    Zum Beispiel: <a href="#" (click)="autoCompleteClicked({'value': 'Berlin'})">Berlin</a>,
-                    <a href="#" (click)="autoCompleteClicked({'value': 'Köln'})">Köln</a>
+                    Zum Beispiel: <a (click)="autoCompleteClicked({'value': 'Berlin'})">Berlin</a>,
+                    <a (click)="autoCompleteClicked({'value': 'Köln'})">Köln</a>
                   </div>
                 </div>
               </div>
@@ -83,7 +83,7 @@
                   <i class="fa fa-facebook" aria-hidden="true"></i></a></li>
                 <li><a class="btn-floating" style="background-color: #55acee" [attr.href]="getShareAbleUrl('twitter')" target="_blank">
                   <i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                <li *ngIf="mobile"><a class="btn-floating" style="background-color: #0dc143" [attr.href]="getShareAbleUrl('whatsapp')" target="_blank">
+                <li *ngIf="mobile"><a class="btn-floating" style="background-color: #0dc143" [attr.href]="getShareAbleUrl('whatsapp')">
                   <i class="fa fa-whatsapp" aria-hidden="true"></i></a></li>
               </ul>
             </div>
@@ -94,7 +94,7 @@
           <div class="card card-margin-top graph-content">
             <div class="row" style="margin-bottom:0px">
               <div class="col s12 m12">
-                <canvas #graphCanvas width="300px" height="250" class="margin-top-15"></canvas>
+                <canvas #graphCanvas width="300px" height="200" class="margin-top-15"></canvas>
               </div>
             </div>
           </div>

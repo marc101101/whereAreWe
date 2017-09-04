@@ -1,53 +1,113 @@
-<div class="row" id="wrapper">
-  <div id="mapContainer" style="width:100%;height:700px"></div>
-  <div id="over_map" style="width:400px">
-
+<div class="row" id="wrapper" style="width:100%">
+  <div id="mapContainer" style="width:100%;height:700px;overflow: visible !important;"></div>
+  <div id="over_map">
     <div class="row">
       <div class="col s12 m12">
-        <div class="card" style="background-color:#026384; width: 100%; height:75px;">
+        <div class="card overlay-wrapper">
           <div class="row">
+            <div class="circle_one"></div>
+            <div class="circle_one_small"></div>
             <div class="col s1 m1" style="padding:0px">
-              <div class="valign-wrapper" style="background-color:white; width: 75px; height: 75px; float:left;margin-right: 15px;">
-                <i class="material-icons" style="color:#026384; width: 100%;height: 100%;text-align: center; margin-top: 47px; font-size: 30px">search</i>
+              <div class="valign-wrapper search-wrapper">
+                <i class="material-icons search-icon">search</i>
               </div>
             </div>
-            <div class="card-content white-text col s9 m9" style="padding:0px; float:right; margin-right:10px; font-size: 21px">
+            <div class="card-content white-text col s9 m9 search-content">
               <div class="input-field">
-                  <input id="search" (keyup)="keyDownFunction($event)" 
-                  type="text" class="validate white-text input-main"
-                  placeholder="Tippen Sie Ihren Städtenamen ein"
-                  autocomplete="off"
-                  [attr.value]="inputValue">
+                <input id="search" (keyup)="keyDownFunction($event)" type="text" class="validate white-text input-main" placeholder="Suchen Sie nach Ihrer Stadt"
+                  autocomplete="off" [attr.value]="inputValue" onClick="this.setSelectionRange(0, this.value.length)">
               </div>
-              <div *ngIf="autoCompleteAvailable" class="card black-text" style="position: absolute; z-index: 1; width: 77%; margin-top: -15px">
-                  <a #result *ngFor="let searchResult of autoCompleteResults; let index = index" (click)="autoCompleteClicked(result)" [attr.data-city]="searchResult[0]">
-                  <div class="card-action" on-mouseover='over($event)' [attr.data-index]="index" [class.active]="index == activeElement">
-                     {{searchResult[0]}}
+              <div *ngIf="autoCompleteAvailable" class="card black-text autocomplete-content">
+                <a #result *ngFor="let searchResult of autoCompleteResults; let index = index" (click)="autoCompleteClicked(result)" [attr.data-city]="searchResult[0]">
+                  <div class="card-action" style="height:auto" on-mouseover='over($event)' [attr.data-index]="index" [class.active]="index == activeElement">
+                    {{searchResult[0]}}
                   </div>
-                  </a>
+                </a>
+              </div>
+              <div *ngIf="!showHelp">
+                <a class="btn-floating btn-large waves-effect waves-dark white location-icon" (click)="showHelp = true">
+                  <i class="material-icons location-icon-style-blue">location_city</i></a>
+              </div>
+              <div *ngIf="showHelp">
+                <a class="btn-floating btn-large waves-effect waves-dark white location-icon" (click)="showHelp = false">
+                    <i class="material-icons location-icon-style-white">location_city</i></a>
+              </div>
+            </div>
+            <div class="col s12 m12 flipInX" *ngIf="showHelp">
+              <div class="card card-margin-top example-content">
+                <div class="row example-row-content">
+                  <div class="col s12 m12">
+                    Zum Beispiel: <a (click)="autoCompleteClicked({'value': 'Berlin'})">Berlin</a>,
+                    <a (click)="autoCompleteClicked({'value': 'Köln'})">Köln</a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div *ngIf="cityClicked" class="col s12 m12 flipInX">
-        <div class="card card-margin-top" style="background-color:#026384;  height:auto;">
-          <div class="row">
-            <div class="circle"></div>
-            <div class="circle_small"></div>
-            <div class="col s3 m3" style="padding: 15px;vertical-align:center">
-              <h4 class="white-text" [style.font-size]="getFontSize(currentCity.sum_over_all)"><b>{{currentCity.sum_over_all}}</b></h4>
-            </div>
-            <div class="col s9 m9" style="margin-left: -13px; padding: 15px; font-size: 14px;">
-              <h6 class="white-text">{{currentCity.city}}</h6>
-              <span class="white-text">Menschen sind von 2010 - 2015 
+      <div [hidden]="!cityClicked">
+        <div class="col s12 m12 flipInX" style="z-index:2">
+          <div class="card card-margin-top city-content">
+            <a class="btn-floating btn-large waves-effect waves-dark white city-icon" (click)="cityClicked = false; showGraph = false">
+              <i class="material-icons" style="color:#026384">close</i></a>
+            <div class="row" *ngIf="cityClicked" style="min-height: 120px">
+              <div class="circle"></div>
+              <div class="circle_small"></div>
+              <div class="col s3 m3 city-font">
+                <h4 class="white-text" [style.font-size]="getFontSize(currentCity.sum_over_all)"><b>{{currentCity.sum_over_all}}</b></h4>
+              </div>
+              <div class="col s9 m9">
+                <h6 class="white-text">{{currentCity.city}}</h6>
+                <span class="white-text city-info-text">Menschen sind von 2010 - 2015 
                     von hier nach Regensburg gezogen.</span>
+              </div>
+            </div>
+            <div *ngIf="showGraph">
+              <a class="btn-floating btn-large waves-effect waves-dark white graph-icon" (click)="showGraph = false">
+                <i class="material-icons" style="background-color:white;color:#026384">show_chart</i>
+              </a>
+            </div>
+            <div *ngIf="!showGraph">
+              <a class="btn-floating btn-large waves-effect waves-dark white graph-icon" (click)="showGraph = true">
+                <i class="material-icons" style="background-color:#026384;color:white">show_chart</i>
+              </a>
+            </div>
+            <div *ngIf="cityClicked" class="fixed-action-btn horizontal click-to-toggle" style="background-color:transparent !important">
+                <a class="btn-floating btn-large waves-effect waves-dark white graph-icon right" style="margin-right: -40px;margin-top: -20px">
+                    <i class="material-icons" style="background-color:#026384;color:white">share</i>
+                </a>
+              <ul>
+                <li><a class="btn-floating" style="background-color: #3b5998" [attr.href]="getShareAbleUrl('facebook')" target="_blank">
+                  <i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                <li><a class="btn-floating" style="background-color: #55acee" [attr.href]="getShareAbleUrl('twitter')" target="_blank">
+                  <i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                <li *ngIf="mobile"><a class="btn-floating" style="background-color: #0dc143" [attr.href]="getShareAbleUrl('whatsapp')">
+                  <i class="fa fa-whatsapp" aria-hidden="true"></i></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div [hidden]="!showGraph" class="col s12 m12 flipInX">
+          <div class="card card-margin-top graph-content">
+            <div class="row" style="margin-bottom:0px">
+              <div class="col s12 m12">
+                <canvas #graphCanvas width="300px" height="200" class="margin-top-15"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="cityClicked" class="col s12 m12 flipInX">
+          <div class="card card-margin-top waves-effect waves-light" style="background-color:#026384;  height:auto; margin-top: -5px">
+            <div class="row" style="margin-bottom:0px">
+              <!--h5 class="white-text" style=" font-size: 20px; text-align:center"><b>Teilen</b></h5-->
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>

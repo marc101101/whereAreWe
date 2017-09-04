@@ -1,8 +1,11 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   NgZone,
-  Renderer
+  Renderer,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 
 import {
@@ -14,27 +17,44 @@ import {
   Headers,
   RequestOptions
 } from '@angular/http';
-import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/map';
+import {DomSanitizer} from '@angular/platform-browser';
 
 declare var require: any;
 declare var $: any
 
 var GoogleMapsLoader = require('google-maps');
+var chartJs = require('chart.js');
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+
+
+export class AppComponent implements OnInit, AfterViewInit {
+  @ViewChild("graphCanvas") graphCanvas: ElementRef;
   map: any;
   google: any;
   globalData: any;
   styleData: any;
-  dataUrl: string = "/assets/data/local_all_result_final.json";
-  mapStyleUrl: string = "/assets/data/map-style.json";
+  dataUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/local_all_result_final.json";
+  mapStyleUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/map-style.json";
+  //dataUrl: string = "/assets/data/local_all_result_final.json";
+  //mapStyleUrl: string = "/assets/data/map-style.json";
   cityClicked: boolean = false;
-  currentCity: any;
+  currentCity: {
+    "city": "",
+    "sum_over_all": 0,
+    "geo_data": {
+      "country": "de",
+      "lat": 49.8817161,
+      "lng": 2.3303441,
+      "region": ""
+    },
+    "data_by_year": [0, 0, 0, 0, 0, 0]
+  };
   currentCircle: any;
   autoCompleteResults: any;
   autoCompleteAvailable: boolean = true;
@@ -43,13 +63,23 @@ export class AppComponent implements OnInit {
   circleClicked: boolean = false;
   circleRegistry = [];
   currentCircleInMap: any;
+  myChart: any;
+  showGraph: boolean = false;
+  globalThis: any;
+  showHelp: boolean = true;
+  mobile: boolean = false;
 
-  constructor(private zone: NgZone, private dataService: DataService, private renderer: Renderer) {}
+  constructor(
+    private zone: NgZone,
+    private dataService: DataService,
+    private renderer: Renderer,
+    private sanitizer:DomSanitizer) {}
 
   ngOnInit() {
     var data = "";
     this.getRadius("");
     let localThis = this;
+    this.globalThis = this;
 
     this.dataService.requestData(this.dataUrl).subscribe(
       data => {
@@ -64,31 +94,72 @@ export class AppComponent implements OnInit {
     )
   }
 
+  ngAfterViewInit() {
+    document.getElementById("mapContainer").style.overflow = "visible";
+    var ua = navigator.userAgent;
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua))
+      this.mobile = true;
+    else
+      this.mobile = false;
+  }
+
+  getShareAbleUrl(social_service): any {
+    switch (social_service) {
+      case "facebook":
+        return "https://www.facebook.com/sharer/sharer.php?u=" + window.location.href;
+      case "whatsapp":
+        return this.sanitizer.bypassSecurityTrustUrl(
+          "whatsapp://send?text=" +
+          window.location.href + 
+          " Von 2010 - 2015 sind  " +
+          this.currentCity.sum_over_all +
+          " Menchen von " + 
+          this.currentCity.city +
+          " nach Regensburg gezogen.");          
+      case "twitter":
+        return "https://twitter.com/intent/tweet?text=" +
+          this.currentCity.sum_over_all +
+          " Menschen sind von 2010 - 2015 von " +
+          this.currentCity.city +
+          " nach Regensburg gezogen." + 
+          window.location.href
+      default:
+        break;
+    }
+  }
+
   getFontSize(sum_over_all): string {
     let lenOfNum = sum_over_all.toString().length;
     switch (lenOfNum) {
       case 4:
-        return "30px";
-      case 5:
         return "25px";
+      case 5:
+        return "20px";
       default:
         return "35px";
     }
   }
 
+  animateShare(event): void {
+    console.log(event);
+  }
+
   over(event): void {
-    this.activeElement = event.target.getAttribute('data-index');
+    let index = event.target.getAttribute('data-index');
+    if ((index < 4) || (index > 0)) {
+      this.activeElement = event.target.getAttribute('data-index');
+    }
   }
 
   keyDownFunction(event): void {
     if (event.key == "ArrowDown") {
       if (this.activeElement < this.autoCompleteResults.length - 1) {
-        this.activeElement = this.activeElement + 1;
+        this.activeElement = +this.activeElement + 1;
       }
     }
     if (event.key == "ArrowUp") {
       if (this.activeElement > 0) {
-        this.activeElement = this.activeElement - 1;
+        this.activeElement = +this.activeElement - 1;
       }
     }
     if (event.key == "Enter") {
@@ -96,38 +167,44 @@ export class AppComponent implements OnInit {
         "value": this.autoCompleteResults[this.activeElement][0]
       })
     } else {
-      this.autoCompleteResults = [];
-      if (event.target.value.length > 0) {
-        this.globalData.migration_data.forEach(element => {
-          var element_low = element.city.toLowerCase();
-          var target_low = event.target.value.toLowerCase();
-          if (element_low.includes(target_low)) {
-            this.autoCompleteResults.push([element.city, element.sum_over_all]);
-          }
-        });
-        this.autoCompleteResults.sort(function (a, b) {
-          var keyA = a[1],
-            keyB = b[1];
-          if (keyA < keyB) return 1;
-          if (keyA > keyB) return -1;
-          return 0;
-        });
-        this.autoCompleteResults = this.autoCompleteResults.slice(0, 4);
-        this.autoCompleteAvailable = true;
+      if (event.key == "Escape") {
+        this.autoCompleteAvailable = false;
+      } else {
+        this.autoCompleteResults = [];
+        if (event.target.value.length > 0) {
+          this.globalData.migration_data.forEach(element => {
+            var element_low = element.city.toLowerCase();
+            var target_low = event.target.value.toLowerCase();
+            if (element_low.includes(target_low)) {
+              this.autoCompleteResults.push([element.city, element.sum_over_all]);
+            }
+          });
+          this.autoCompleteResults.sort(function (a, b) {
+            var keyA = a[1],
+              keyB = b[1];
+            if (keyA < keyB) return 1;
+            if (keyA > keyB) return -1;
+            return 0;
+          });
+
+          this.autoCompleteResults = this.autoCompleteResults.slice(0, 4);
+          this.autoCompleteAvailable = true;
+          this.showHelp = false;
+        }
       }
     }
   }
 
   autoCompleteClicked(event): void {
+
     try {
-      var cityClicked = event.getAttribute('data-city');
+      var cityClickedKey = event.getAttribute('data-city');
     } catch (error) {
-      var cityClicked = event.value;
+      var cityClickedKey = event.value;
     }
-    this.inputValue = cityClicked;
 
     this.globalData.migration_data.forEach(element => {
-      if (element.city.includes(cityClicked)) {
+      if (element.city.includes(cityClickedKey)) {
         this.currentCity = element;
         this.map.setCenter({
           lat: this.currentCity.geo_data.lat,
@@ -138,8 +215,10 @@ export class AppComponent implements OnInit {
         this.cityClicked = true;
       }
     });
-    this.autoCompleteAvailable = false;
 
+    (<HTMLInputElement > document.getElementById("search")).value = this.currentCity.city;
+    this.autoCompleteAvailable = false;
+    this.setGraphView(this.currentCity.data_by_year);
   }
 
   highlightClickedCircle(): void {
@@ -150,13 +229,50 @@ export class AppComponent implements OnInit {
             fillColor: '#026384',
             strokeColor: '#026384'
           });
-        } catch (error) {         
-        }
+        } catch (error) {}
         this.currentCircleInMap = element;
         element.setOptions({
           fillColor: '#d7490b',
           strokeColor: '#026384'
         });
+      }
+    });
+  }
+
+  setGraphView(data_by_year): void {
+    if (this.myChart) {
+      this.myChart.destroy();
+    }
+
+    let context: CanvasRenderingContext2D = this.graphCanvas.nativeElement.getContext("2d");
+
+    this.myChart = new chartJs(context, {
+      type: 'line',
+      data: {
+        labels: ["2010", "2011", "2012", "2013", "2014", "2015"],
+        datasets: [{
+          data: data_by_year,
+          backgroundColor: [
+            'rgba(34, 117, 146, 1)',
+            'rgba(34, 117, 146, 1)',
+            'rgba(34, 117, 146, 1)',
+            'rgba(34, 117, 146, 1)',
+            'rgba(34, 117, 146, 1)',
+            'rgba(34, 117, 146, 1)'
+          ],
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        legend: {
+          display: false
+        }
       }
     });
   }
@@ -171,12 +287,13 @@ export class AppComponent implements OnInit {
     GoogleMapsLoader.load((google) => {
       localThis.map = new google.maps.Map(document.getElementById("mapContainer"), {
         center: {
-          lat: 51.8134297,
-          lng: 12.1016236
+          lat: 51.720915,
+          lng: 10.357579
         },
         zoom: 6,
         mapTypeControl: false,
         streetViewControl: false,
+        fullscreenControl: false,
         styles: localThis.styleData
       });
 
@@ -204,6 +321,7 @@ export class AppComponent implements OnInit {
             cityCircle.addListener('click', function (e) {
               localThis.currentCity = cityCircle.data_obj;
               localThis.cityClicked = true;
+              localThis.showHelp = false;
 
               localThis.zone.run(() => {});
               cityCircle.setOptions({
@@ -223,6 +341,9 @@ export class AppComponent implements OnInit {
                 lng: localThis.currentCity.geo_data.lng
               });
               localThis.map.setZoom(10);
+              localThis.setGraphView(localThis.currentCity.data_by_year);
+              (<HTMLInputElement > document.getElementById("search")).value = localThis.currentCity.city;
+              
             });
 
             cityCircle.addListener('mouseover', function (e) {

@@ -331,9 +331,9 @@ textarea.materialize-textarea {
   z-index: 5!important;
 }
 
-.fixed-action-btn.horizontal ul {
-  right: 0px!important;
-  top: -30px!important;
+.fixed-action-btn.horizontal[_ngcontent-c0] ul[_ngcontent-c0] {
+  right: 20px!important;
+  top: -50px!important;
 }
 
 .fixed-action-btn.horizontal ul li {

@@ -74,17 +74,17 @@
                 <i class="material-icons" style="background-color:#026384;color:white">show_chart</i>
               </a>
             </div>
-            <div *ngIf="cityClicked" class="fixed-action-btn horizontal click-to-toggle" style="background-color:transparent !important">
+            <div *ngIf="cityClicked" class="fixed-action-btn horizontal click-to-toggle" style="background-color:transparent !important; float: right; margin-right: -20px;margin-top: 20px;">
                 <a class="btn-floating btn-large waves-effect waves-dark white graph-icon right" style="margin-right: -40px;margin-top: -20px">
-                    <i class="material-icons" style="background-color:#026384;color:white">share</i>
+                    <i class="material-icons" style="background-color:#026384;color:white;">share</i>
                 </a>
               <ul>
                 <li><a class="btn-floating" style="background-color: #3b5998" [attr.href]="getShareAbleUrl('facebook')" target="_blank">
-                  <i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                  <i class="icon-share-facebook" aria-hidden="true"></i></a></li>
                 <li><a class="btn-floating" style="background-color: #55acee" [attr.href]="getShareAbleUrl('twitter')" target="_blank">
-                  <i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                  <i class="icon-share-twitter" aria-hidden="true"></i></a></li>
                 <li *ngIf="mobile"><a class="btn-floating" style="background-color: #0dc143" [attr.href]="getShareAbleUrl('whatsapp')">
-                  <i class="fa fa-whatsapp" aria-hidden="true"></i></a></li>
+                  <i class="icon-share-whatsapp" aria-hidden="true"></i></a></li>
               </ul>
             </div>
           </div>

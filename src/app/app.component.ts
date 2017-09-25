@@ -65,7 +65,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   currentCircleInMap: any;
   myChart: any;
   showGraph: boolean = false;
-  globalThis: any;
   showHelp: boolean = true;
   mobile: boolean = false;
 
@@ -79,19 +78,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     var data = "";
     this.getRadius("");
     let localThis = this;
-    this.globalThis = this;
-
-    this.dataService.requestData(this.dataUrl).subscribe(
-      data => {
-        localThis.globalData = data;
-        localThis.dataService.requestData(localThis.mapStyleUrl).subscribe(
-          data_style => {
-            localThis.styleData = data_style;
-            localThis.initMap(localThis);
-          }
-        )
-      }
-    )
+    this.globalData = this.dataService.requestData_map(this.dataUrl);
+    this.styleData = this.dataService.requestData_style(this.mapStyleUrl);
+    this.initMap(this);        
   }
 
   ngAfterViewInit() {

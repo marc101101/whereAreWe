@@ -39,10 +39,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   google: any;
   globalData: any;
   styleData: any;
-  dataUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/local_all_result_final.json";
-  mapStyleUrl: string = "http://dig-red.mittelbayerische.de/zugezogene/assets/data/map-style.json";
-  //dataUrl: string = "/assets/data/local_all_result_final.json";
-  //mapStyleUrl: string = "/assets/data/map-style.json";
   cityClicked: boolean = false;
   currentCity: {
     "city": "",
@@ -78,8 +74,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     var data = "";
     this.getRadius("");
     let localThis = this;
-    this.globalData = this.dataService.requestData_map(this.dataUrl);
-    this.styleData = this.dataService.requestData_style(this.mapStyleUrl);
+    this.globalData = this.dataService.requestData_map();
+    this.styleData = this.dataService.requestData_style();
     this.initMap(this);        
   }
 
